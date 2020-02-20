@@ -36,7 +36,7 @@ public class ReadFile {
             booksPerLibrary.put(i, booksInLibrary);
         }
         System.out.println("Books per library: " + booksPerLibrary);
-        System.out.println("SignUp and shipping info: " + signUpAndShippingRatePerLibrary);
+        System.out.println("SignUp and shipping info: " + signupAndShippingRatePerLibrary);
 
     }
 
