@@ -20,14 +20,14 @@ public class ReadFile {
 //            System.out.println(b);
         int numOfBooksPerLibrary;
         Map<Integer, List<Integer>> booksPerLibrary = new HashMap<>();
-        Map<Integer, Map<Integer, Integer>> signupAndShippingRatePerLibrary = new HashMap<>();
+        Map<Integer, Map<Integer, Integer>> signUpAndShippingRatePerLibrary = new HashMap<>();
         List<Integer> booksInLibrary;
         for (int i=0; i<numOfLibraries; i++) {
             booksInLibrary = new ArrayList<>();
             numOfBooksPerLibrary = Integer.parseInt(scanner.next());
             Map<Integer, Integer> signUpShippingPair = new HashMap<>();
             signUpShippingPair.put(Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()));
-            signupAndShippingRatePerLibrary.put(i, signUpShippingPair);
+            signUpAndShippingRatePerLibrary.put(i, signUpShippingPair);
             int tempCounter = 0;
             while (tempCounter < numOfBooksPerLibrary) {
                 booksInLibrary.add(Integer.parseInt(scanner.next()));
@@ -36,7 +36,7 @@ public class ReadFile {
             booksPerLibrary.put(i, booksInLibrary);
         }
         System.out.println("Books per library: " + booksPerLibrary);
-        System.out.println("SignUp and shipping info: " + signupAndShippingRatePerLibrary);
+        System.out.println("SignUp and shipping info: " + signUpAndShippingRatePerLibrary);
 
     }
 
