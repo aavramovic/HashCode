@@ -6,9 +6,10 @@ import java.io.*;
 public class ReadFileIntoList {
     public List<Integer> ReadFile(String fileIn) throws FileNotFoundException {
         List<String> lines = new LinkedList<>();
-        Scanner scanner = new Scanner(new File(fileIn));
+            Scanner scanner = new Scanner(new File(fileIn));
         int total = Integer.parseInt(scanner.next());
         int noOfItems = Integer.parseInt(scanner.next()) - 1;
+        int score = 0;
         while (scanner.hasNext()) {
             lines.add(0, scanner.next());
         }
@@ -18,11 +19,13 @@ public class ReadFileIntoList {
             if (Integer.parseInt(slice) < total) {
                 list.add(noOfItems - index);
                 total -= Integer.parseInt(slice);
+                score += Integer.parseInt(slice);
             }
             index++;
         }
         return list;
     }
+
 
     public void WriteList(List<Integer> list, String fileOut) throws IOException {
         FileWriter fileWriter = new FileWriter(fileOut);
