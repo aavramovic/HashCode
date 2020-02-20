@@ -36,7 +36,7 @@ public class ReadFile {
             booksPerLibrary.put(i, booksInLibrary);
         }
         System.out.println("Books per library: " + booksPerLibrary);
-        System.out.println("SignUp and shipping info: " + signupAndShippingRatePerLibrary);
+        System.out.println("SignUp and shipping info: " + signUpAndShippingRatePerLibrary);
 
     }
 
@@ -50,7 +50,6 @@ public class ReadFile {
     }
 
     public static void main(String[] args) throws IOException {
-        readFileMethod("src/a_example.txt");
         String[] listIn = new String[6];
         listIn[0] = ("src/Input/a_example.txt");
         listIn[1] = ("src/Input/b_read_on.txt");
@@ -66,9 +65,8 @@ public class ReadFile {
 //        listOut[3] = ("src/d_solution.out");
 //        listOut[4] = ("src/e_solution.out");
 //        ReadFile ex = new ReadFile();
-//        for (int i = 0; i < 5; i++) {
-//            List<Integer> list = ex.ReadFileMethod(listIn[i]);
-//            ex.WriteList(list, listOut[i]);
-//        }
+        for (int i = 0; i < 5; i++) {
+            readFileMethod(listIn[i]);
+        }
     }
 }
