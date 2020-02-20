@@ -1,6 +1,45 @@
 import java.util.*;
 import java.io.*;
 
+class Library {
+    int id;
+    List<Integer> booksPerLibrary = new ArrayList<>();
+    float grade;
+    int booksPerDay;
+    int signUpTime;
+    int numberOfBooks;
+    int averageScore;
+    int totalScore;
+    static List<Integer> bookScores = new ArrayList<>();
+
+    public Library(int id, List<Integer> booksPerLibrary, int booksPerDay, int signUpTime) {
+        this.numberOfBooks = booksPerLibrary.size();
+        this.id = id;
+        this.booksPerLibrary = booksPerLibrary;
+        this.booksPerDay = booksPerDay;
+        this.signUpTime = signUpTime;
+        for (Integer book : booksPerLibrary) {
+            totalScore += bookScores.get(book);
+        }
+        this.averageScore = totalScore / numberOfBooks;
+        this.grade = Grade();
+
+    }
+
+    public Integer Grade() {
+        int grade = booksPerLibrary.size() / booksPerDay + totalScore / signUpTime;
+        return 0;
+    }
+    public void Report(){
+        System.out.println("ID: " + id);
+        System.out.println("Grade: " + grade);
+        System.out.println("Books per day: " + booksPerDay);
+        System.out.println("SignUp time: " + signUpTime);
+
+    }
+}
+
+
 public class ReadFile {
     public static void readFileMethod(String fileIn) throws FileNotFoundException {
         List<String> lines = new LinkedList<>();
@@ -9,36 +48,42 @@ public class ReadFile {
         int numOfLibraries = Integer.parseInt(scanner.next());
         int daysForScanning = Integer.parseInt(scanner.next());
         List<Integer> bookScores = new ArrayList<>();
-        for (int i=0; i<numOfBooks; i++) {
+        for (int i = 0; i < numOfBooks; i++) {
             bookScores.add(Integer.parseInt(scanner.next()));
         }
-        System.out.println(bookScores);
-//        System.out.println(numOfBooks);
-//        System.out.println(numOfLibraries);
-//        System.out.println(daysForScanning);
-//        for (int b : books)
-//            System.out.println(b);
-        int numOfBooksPerLibrary;
-        Map<Integer, List<Integer>> booksPerLibrary = new HashMap<>();
-        Map<Integer, Map<Integer, Integer>> signUpAndShippingRatePerLibrary = new HashMap<>();
-        List<Integer> booksInLibrary;
-        for (int i=0; i<numOfLibraries; i++) {
-            booksInLibrary = new ArrayList<>();
-            numOfBooksPerLibrary = Integer.parseInt(scanner.next());
-            Map<Integer, Integer> signUpShippingPair = new HashMap<>();
-            signUpShippingPair.put(Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()));
-            signUpAndShippingRatePerLibrary.put(i, signUpShippingPair);
-            int tempCounter = 0;
-            while (tempCounter < numOfBooksPerLibrary) {
-                booksInLibrary.add(Integer.parseInt(scanner.next()));
-                tempCounter++;
-            }
-            booksPerLibrary.put(i, booksInLibrary);
-        }
-        System.out.println("Books per library: " + booksPerLibrary);
-        System.out.println("SignUp and shipping info: " + signUpAndShippingRatePerLibrary);
+        Library.bookScores = bookScores;
+        List<Library> libraries = new ArrayList<>();
 
+        List<Integer> booksInLibrary;
+        for (int i = 0; i < numOfLibraries; i++) {
+            booksInLibrary = new ArrayList<>();
+            int numberOfBooks = Integer.parseInt(scanner.next());
+            int signUpTime = Integer.parseInt(scanner.next());
+            int booksPerDay = Integer.parseInt(scanner.next());
+            for (int j = 0; j < numberOfBooks; j++) {
+                int bookId = Integer.parseInt(scanner.next());
+                booksInLibrary.add(bookId);
+            }
+            libraries.add(new Library(i, booksInLibrary, booksPerDay, signUpTime));
+        }
+        libraries.sort(Comparator.comparing(Library::Grade));
+        int numberOfLibraries = 0;
+        int daysForScanningClone = daysForScanning;
+        for (Library library : libraries) {
+            if (library.signUpTime < daysForScanningClone) {
+                numberOfLibraries++;
+                daysForScanningClone -= library.signUpTime;
+            }
+        }
+        System.out.println(numberOfLibraries);
+        for(int i=0; i<numberOfLibraries; i++){
+            Library library = libraries.get(i);
+            System.out.println(library.id);
+
+            System.out.println(library.numberOfBooks);
+        }
     }
+
 
     public void WriteList(List<Integer> list, String fileOut) throws IOException {
         FileWriter fileWriter = new FileWriter(fileOut);
