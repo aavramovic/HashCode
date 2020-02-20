@@ -52,12 +52,12 @@ public class ReadFile {
     public static void main(String[] args) throws IOException {
         readFileMethod("src/a_example.txt");
         String[] listIn = new String[6];
-        listIn[0] = ("src/a_example.txt");
-        listIn[1] = ("src/b_read_on.txt");
-        listIn[2] = ("src/c_incunabula.txt");
-        listIn[3] = ("src/d_tough_choices.txt");
-        listIn[4] = ("src/e_so_many_books.txt");
-        listIn[5] = ("src/f_libraries_of_the_world.txt");
+        listIn[0] = ("Input/a_example.txt");
+        listIn[1] = ("Input/b_read_on.txt");
+        listIn[2] = ("Input/c_incunabula.txt");
+        listIn[3] = ("Input/d_tough_choices.txt");
+        listIn[4] = ("Input/e_so_many_books.txt");
+        listIn[5] = ("Input/f_libraries_of_the_world.txt");
 
         //        String[] listOut = new String[6];
 //        listOut[0] = ("src/a_solution.out");
