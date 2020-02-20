@@ -124,14 +124,15 @@ public class ReadFile {
 
 
         }
-        fileWriter.write(numberOfLibraries + "\n");
+        fileWriter.write(listLibraries.size() + "\n");
         for (int i = 0; i < listLibraries.size(); i++) {
             fileWriter.write(listLibraries.get(i) + " ");
-            fileWriter.write(listAvailableBooks.get(i));
+            fileWriter.write(listAvailableBooks.get(i) + "");
             fileWriter.write("\n");
             for (int j = 0; j < listList.get(i).size(); j++) {
                 fileWriter.write(listList.get(i).get(j) + " ");
             }
+            fileWriter.write("\n");
         }
         fileWriter.close();
     }
