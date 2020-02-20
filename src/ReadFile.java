@@ -50,7 +50,7 @@ public class ReadFile {
     }
 
     public static void main(String[] args) throws IOException {
-        readFileMethod("src/a_example.txt");
+        readFileMethod("src/Input/a_example.txt");
 //        String[] listIn = new String[5];
 //        listIn[0] = ("src/a_example.txt");
 //        listIn[1] = ("src/b_small.txt");
