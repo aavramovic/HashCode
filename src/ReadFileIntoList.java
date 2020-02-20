@@ -4,24 +4,42 @@ import java.nio.file.*;
 import java.io.*;
 
 public class ReadFileIntoList {
-    public List<Integer> ReadFile(String fileIn) throws FileNotFoundException {
+    public static void ReadFile(String fileIn) throws FileNotFoundException {
         List<String> lines = new LinkedList<>();
         Scanner scanner = new Scanner(new File(fileIn));
-        int total = Integer.parseInt(scanner.next());
-        int noOfItems = Integer.parseInt(scanner.next()) - 1;
-        while (scanner.hasNext()) {
-            lines.add(0, scanner.next());
+        int numOfBooks = Integer.parseInt(scanner.next());
+        int numOfLibraries = Integer.parseInt(scanner.next());
+        int daysForScanning = Integer.parseInt(scanner.next());
+        List<Integer> bookScores = new ArrayList<>();
+        for (int i=0; i<numOfBooks; i++) {
+            bookScores.add(Integer.parseInt(scanner.next()));
         }
-        List<Integer> list = new LinkedList<>();
-        int index = 0;
-        for (String slice : lines) {
-            if (Integer.parseInt(slice) < total) {
-                list.add(noOfItems - index);
-                total -= Integer.parseInt(slice);
+        System.out.println(bookScores);
+//        System.out.println(numOfBooks);
+//        System.out.println(numOfLibraries);
+//        System.out.println(daysForScanning);
+//        for (int b : books)
+//            System.out.println(b);
+        int numOfBooksPerLibrary;
+        Map<Integer, List<Integer>> booksPerLibrary = new HashMap<>();
+        Map<Integer, Map<Integer, Integer>> signupAndShippingRatePerLibrary = new HashMap<>();
+        List<Integer> booksInLibrary;
+        for (int i=0; i<numOfLibraries; i++) {
+            booksInLibrary = new ArrayList<>();
+            numOfBooksPerLibrary = Integer.parseInt(scanner.next());
+            Map<Integer, Integer> signUpShippingPair = new HashMap<>();
+            signUpShippingPair.put(Integer.parseInt(scanner.next()), Integer.parseInt(scanner.next()));
+            signupAndShippingRatePerLibrary.put(i, signUpShippingPair);
+            int tempCounter = 0;
+            while (tempCounter < numOfBooksPerLibrary) {
+                booksInLibrary.add(Integer.parseInt(scanner.next()));
+                tempCounter++;
             }
-            index++;
+            booksPerLibrary.put(i, booksInLibrary);
         }
-        return list;
+        System.out.println("Books per library: " + booksPerLibrary);
+        System.out.println("SignUp and shipping info: " + signupAndShippingRatePerLibrary);
+
     }
 
     public void WriteList(List<Integer> list, String fileOut) throws IOException {
@@ -34,22 +52,23 @@ public class ReadFileIntoList {
     }
 
     public static void main(String[] args) throws IOException {
-        String[] listIn = new String[5];
-        listIn[0] = ("src/a_example.in");
-        listIn[1] = ("src/b_small.in");
-        listIn[2] = ("src/c_medium.in");
-        listIn[3] = ("src/d_quite_big.in");
-        listIn[4] = ("src/e_also_big.in");
-        String[] listOut = new String[5];
-        listOut[0] = ("src/a_solution.out");
-        listOut[1] = ("src/b_solution.out");
-        listOut[2] = ("src/c_solution.out");
-        listOut[3] = ("src/d_solution.out");
-        listOut[4] = ("src/e_solution.out");
-        ReadFileIntoList ex = new ReadFileIntoList();
-        for (int i = 0; i < 5; i++) {
-            List<Integer> list = ex.ReadFile(listIn[i]);
-            ex.WriteList(list, listOut[i]);
-        }
+       readFileMethod("src/a_example.txt");
+//        String[] listIn = new String[5];
+//        listIn[0] = ("src/a_example.txt");
+//        listIn[1] = ("src/b_small.txt");
+//        listIn[2] = ("src/c_medium.txt");
+//        listIn[3] = ("src/d_quite_big.txt");
+//        listIn[4] = ("src/e_also_big.txt");
+//        String[] listOut = new String[5];
+//        listOut[0] = ("src/a_solution.out");
+//        listOut[1] = ("src/b_solution.out");
+//        listOut[2] = ("src/c_solution.out");
+//        listOut[3] = ("src/d_solution.out");
+//        listOut[4] = ("src/e_solution.out");
+//        ReadFile ex = new ReadFile();
+//        for (int i = 0; i < 5; i++) {
+//            List<Integer> list = ex.ReadFileMethod(listIn[i]);
+//            ex.WriteList(list, listOut[i]);
+//        }
     }
 }
