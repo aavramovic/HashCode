@@ -4,8 +4,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-class Book{
-    float grade;
+class Book implements Comparable<Book> {
+    double grade;
     int id;
     int score;
     int noOfBooks;
@@ -14,15 +14,21 @@ class Book{
         this.id = id;
         this.score = score;
         this.noOfBooks = 1;
-        this.grade = Grade();
+        this.grade = 0;
     }
 
-    private float Grade() {
-        return 0;
+    public void Grade() {
+        grade = score / (noOfBooks * 1.0);
     }
+
+    @Override
+    public int compareTo(Book book) {
+        return book.score - this.score;
+    }
+
 }
 
-class Library {
+class Library implements Comparable<Library> {
     int id;
     List<Book> booksPerLibrary;
     double grade;
@@ -33,6 +39,7 @@ class Library {
     float totalScore;
     int startingDay;
     int availableBooks;
+    float averageGrade;
 
     public Library(int id, List<Book> booksPerLibrary, int booksPerDay, int signUpTime) {
         this.numberOfBooks = booksPerLibrary.size();
@@ -45,20 +52,29 @@ class Library {
             totalScore += book.score;
         }
         this.averageScore = totalScore / numberOfBooks;
-        this.grade = Grade();
+        this.grade = 0;
     }
 
-    public double Grade() {
-        //Grade libraries
-        //Grade books
-        return booksPerLibrary.size() / (booksPerDay*0.1) + totalScore / signUpTime;
+    public void Grade() {
+        averageGrade = 0;
+        booksPerLibrary.forEach(book -> averageGrade += book.grade);
+        averageGrade /= booksPerLibrary.size();
+        this.grade = (booksPerLibrary.size() * 1.0 / booksPerDay) + (totalScore / signUpTime);
     }
 
+    @Override
+    public int compareTo(Library library) {
+        if (this.grade < library.grade)
+            return 1;
+        else if (this.grade > library.grade)
+            return -1;
+        return 0;
+    }
 }
 
 class Solution {
-    List<Library> listLibraries = new ArrayList<>();
-    List<List<Book>> listList = new ArrayList<>();
+    List<Library> listLibraries;
+    List<List<Book>> listList;
     String fileOut;
 
     public Solution(List<Library> listLibraries, List<List<Book>> listList, String fileOut) {
@@ -68,10 +84,6 @@ class Solution {
     }
 
     public void WriteList() throws IOException {
-//        System.out.println("-------" + fileOut + "-------");
-//        for(Library library : listLibraries){
-//            System.out.println(library.id);
-//        }
         FileWriter fileWriter = new FileWriter("src/Output/" + fileOut);
         fileWriter.write(listLibraries.size() + "\n");
         for (int i = 0; i < listLibraries.size(); i++) {
@@ -126,26 +138,27 @@ class Problem {
     }
 
     public void Solve() {
-//        libraries.forEach(library -> library.booksPerLibrary.sort(Comparator.comparing(book -> book.grade)));
-        libraries.sort(Comparator.comparing(Library::Grade));
+        libraries.forEach(library -> library.booksPerLibrary.forEach(Book::Grade));
+        libraries.forEach(Library::Grade);
+
+        libraries.forEach(library -> library.booksPerLibrary.sort(Book::compareTo));
+        libraries.sort(Library::compareTo);
         int numberOfLibraries = 0;
         int daysPassed = 0;
         for (Library library : libraries) {
-            if (daysPassed < daysForScanning) {
+            if (daysPassed + library.signUpTime < daysForScanning) {
                 numberOfLibraries++;
                 daysPassed += library.signUpTime;
                 library.startingDay = daysPassed;
             }
         }
-        if (daysPassed > daysForScanning)
-            numberOfLibraries--;
         for (int i = 0; i < numberOfLibraries; i++) {
             Library library = libraries.get(i);
             int availableBooks = 0;
 
             List<Book> books = new ArrayList<>();
             int realisticNumberOfBooks =
-                    Math.min(library.numberOfBooks, (daysForScanning - library.startingDay + 1) * library.booksPerDay);
+                    Math.min(library.numberOfBooks, (daysForScanning - library.startingDay) * library.booksPerDay);
 
             for (int j = 0; j < library.numberOfBooks; j++) {
                 Book book = library.booksPerLibrary.get(j);
@@ -178,15 +191,15 @@ class Problem {
 
 public class ReadFile {
     public static void main(String[] args) throws IOException {
-        String[] listIn = new String[6];
-        listIn[0] = ("a_example.txt");
-        listIn[1] = ("b_read_on.txt");
-        listIn[2] = ("c_incunabula.txt");
-        listIn[3] = ("d_tough_choices.txt");
-        listIn[4] = ("e_so_many_books.txt");
-        listIn[5] = ("f_libraries_of_the_world.txt");
-        for (int i = 0; i < 6; i++) {
-            Problem problem = new Problem(listIn[i]);
+        List<String> listIn = new ArrayList<>();
+        listIn.add("a_example.txt");
+        listIn.add("b_read_on.txt");
+        listIn.add("c_incunabula.txt");
+        listIn.add("d_tough_choices.txt");
+        listIn.add("e_so_many_books.txt");
+        listIn.add("f_libraries_of_the_world.txt");
+        for (String s : listIn) {
+            Problem problem = new Problem(s);
             problem.Solve();
             problem.solution.WriteList();
         }
