@@ -4,92 +4,112 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+class Book{
+    float grade;
+    int id;
+    int score;
+    int noOfBooks;
+
+    public Book(int id, int score) {
+        this.id = id;
+        this.score = score;
+        this.noOfBooks = 1;
+        this.grade = Grade();
+    }
+
+    private float Grade() {
+        return 0;
+    }
+}
+
 class Library {
     int id;
-    List<Integer> booksPerLibrary = new ArrayList<>();
-    float grade;
+    List<Book> booksPerLibrary;
+    double grade;
     int booksPerDay;
     int signUpTime;
     int numberOfBooks;
-    int averageScore;
-    int totalScore;
+    float averageScore;
+    float totalScore;
     int startingDay;
-    static List<Integer> bookScores = new ArrayList<>();
+    int availableBooks;
 
-    public Library(int id, List<Integer> booksPerLibrary, int booksPerDay, int signUpTime) {
+    public Library(int id, List<Book> booksPerLibrary, int booksPerDay, int signUpTime) {
         this.numberOfBooks = booksPerLibrary.size();
         this.id = id;
         this.booksPerLibrary = booksPerLibrary;
         this.booksPerDay = booksPerDay;
         this.signUpTime = signUpTime;
-        for (Integer book : booksPerLibrary) {
-            totalScore += bookScores.get(book);
+        this.availableBooks = 0;
+        for (Book book : booksPerLibrary) {
+            totalScore += book.score;
         }
         this.averageScore = totalScore / numberOfBooks;
         this.grade = Grade();
-
     }
 
-    public Integer Grade() {
+    public double Grade() {
         //Grade libraries
         //Grade books
-        int grade = booksPerLibrary.size() / booksPerDay + totalScore / signUpTime;
-        return 0;
+        return booksPerLibrary.size() / (booksPerDay*0.1) + totalScore / signUpTime;
     }
 
 }
 
-class Solution{
-    List<Integer> listLibraries = new ArrayList<>();
-    List<Integer> listAvailableBooks = new ArrayList<>();
-    List<List<Integer>> listList = new ArrayList<>();
+class Solution {
+    List<Library> listLibraries = new ArrayList<>();
+    List<List<Book>> listList = new ArrayList<>();
     String fileOut;
 
-    public Solution(List<Integer> listLibraries, List<Integer> listAvailableBooks, List<List<Integer>> listList, String fileOut) {
+    public Solution(List<Library> listLibraries, List<List<Book>> listList, String fileOut) {
         this.listLibraries = listLibraries;
-        this.listAvailableBooks = listAvailableBooks;
         this.listList = listList;
         this.fileOut = fileOut;
     }
+
     public void WriteList() throws IOException {
+//        System.out.println("-------" + fileOut + "-------");
+//        for(Library library : listLibraries){
+//            System.out.println(library.id);
+//        }
         FileWriter fileWriter = new FileWriter("src/Output/" + fileOut);
         fileWriter.write(listLibraries.size() + "\n");
         for (int i = 0; i < listLibraries.size(); i++) {
-            fileWriter.write(listLibraries.get(i) + " ");
-            fileWriter.write(listAvailableBooks.get(i) + "");
+            fileWriter.write(listLibraries.get(i).id + " ");
+            fileWriter.write(listLibraries.get(i).availableBooks + "");
             fileWriter.write("\n");
             for (int j = 0; j < listList.get(i).size(); j++) {
-                fileWriter.write(listList.get(i).get(j) + " ");
+                fileWriter.write(listList.get(i).get(j).id + " ");
             }
             fileWriter.write("\n");
         }
         fileWriter.close();
     }
 }
-class Problem{
+
+class Problem {
     int numOfBooks;
     int numOfLibraries;
     int daysForScanning;
     String fileIn;
-    List<Integer> bookScores = new ArrayList<>();
+    List<Book> books = new ArrayList<>();
     List<Library> libraries = new ArrayList<>();
-    Set<Integer> booksScanned = new HashSet<>();
-    List<Integer> booksInLibrary = new ArrayList<>();
+    Set<Book> booksScanned = new HashSet<>();
+    List<Book> booksInLibrary;
     Solution solution;
 
-    List<Integer> listLibraries = new ArrayList<>();
-    List<Integer> listAvailableBooks = new ArrayList<>();
-    List<List<Integer>> listList = new ArrayList<>();
+    List<Library> listLibraries = new ArrayList<>();
+    List<List<Book>> listList = new ArrayList<>();
+
     public Problem(String fileIn) throws FileNotFoundException {
+        this.fileIn = fileIn;
         Scanner scanner = new Scanner(new File("src/Input/" + fileIn));
         numOfBooks = Integer.parseInt(scanner.next());
         numOfLibraries = Integer.parseInt(scanner.next());
         daysForScanning = Integer.parseInt(scanner.next());
-        bookScores = new ArrayList<>();
         for (int i = 0; i < numOfBooks; i++) {
-            bookScores.add(Integer.parseInt(scanner.next()));
+            books.add(new Book(i, Integer.parseInt(scanner.next())));
         }
-        Library.bookScores = bookScores; //static
         for (int i = 0; i < numOfLibraries; i++) {
             booksInLibrary = new ArrayList<>();
             int numberOfBooks = Integer.parseInt(scanner.next());
@@ -97,14 +117,16 @@ class Problem{
             int booksPerDay = Integer.parseInt(scanner.next());
             for (int j = 0; j < numberOfBooks; j++) {
                 int bookId = Integer.parseInt(scanner.next());
-                booksInLibrary.add(bookId);
+                booksInLibrary.add(books.get(bookId));
+                books.get(bookId).noOfBooks++;
             }
             libraries.add(new Library(i, booksInLibrary, booksPerDay, signUpTime));
         }
 
     }
 
-    public void Solve() throws IOException {
+    public void Solve() {
+//        libraries.forEach(library -> library.booksPerLibrary.sort(Comparator.comparing(book -> book.grade)));
         libraries.sort(Comparator.comparing(Library::Grade));
         int numberOfLibraries = 0;
         int daysPassed = 0;
@@ -121,34 +143,34 @@ class Problem{
             Library library = libraries.get(i);
             int availableBooks = 0;
 
-            List<Integer> books = new ArrayList<>();
+            List<Book> books = new ArrayList<>();
             int realisticNumberOfBooks =
                     Math.min(library.numberOfBooks, (daysForScanning - library.startingDay + 1) * library.booksPerDay);
 
             for (int j = 0; j < library.numberOfBooks; j++) {
-                int book = library.booksPerLibrary.get(j);
-                if (bookScores.get(book) >= library.averageScore && !booksScanned.contains(book) && availableBooks < realisticNumberOfBooks) {
+                Book book = library.booksPerLibrary.get(j);
+                if (book.score >= library.averageScore && !booksScanned.contains(book) && availableBooks < realisticNumberOfBooks) {
                     booksScanned.add(book);
                     availableBooks++;
                     books.add(book);
                 }
             }
             for (int j = 0; j < library.numberOfBooks; j++) {
-                int book = library.booksPerLibrary.get(j);
-                if (bookScores.get(book) < library.averageScore && !booksScanned.contains(book) && availableBooks < realisticNumberOfBooks) {
+                Book book = library.booksPerLibrary.get(j);
+                if (book.score < library.averageScore && !booksScanned.contains(book) && availableBooks < realisticNumberOfBooks) {
                     booksScanned.add(book);
                     availableBooks++;
                     books.add(book);
                 }
             }
             if (availableBooks > 0) {
-                listLibraries.add(library.id);
-                listAvailableBooks.add(availableBooks);
+                library.availableBooks = availableBooks;
+                listLibraries.add(library);
 
-                List<Integer> temp = new ArrayList<>(books);
+                List<Book> temp = new ArrayList<>(books);
                 listList.add(temp);
             }
-            solution = new Solution(listLibraries, listAvailableBooks, listList, fileIn);
+            solution = new Solution(listLibraries, listList, fileIn);
         }
 
     }
