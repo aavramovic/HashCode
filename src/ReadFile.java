@@ -30,10 +30,10 @@ class Book implements Comparable<Book> {
 
 class Library implements Comparable<Library> {
     int id;
-    List<Book> booksPerLibrary;
+    List<Book> books;
     double grade;
     int booksPerDay;
-    int signUpTime;
+    float signUpTime;
     int numberOfBooks;
     float averageScore;
     float totalScore;
@@ -41,14 +41,14 @@ class Library implements Comparable<Library> {
     int availableBooks;
     float averageGrade;
 
-    public Library(int id, List<Book> booksPerLibrary, int booksPerDay, int signUpTime) {
-        this.numberOfBooks = booksPerLibrary.size();
+    public Library(int id, List<Book> books, int booksPerDay, int signUpTime) {
+        this.numberOfBooks = books.size();
         this.id = id;
-        this.booksPerLibrary = booksPerLibrary;
+        this.books = books;
         this.booksPerDay = booksPerDay;
         this.signUpTime = signUpTime;
         this.availableBooks = 0;
-        for (Book book : booksPerLibrary) {
+        for (Book book : books) {
             totalScore += book.score;
         }
         this.averageScore = totalScore / numberOfBooks;
@@ -57,9 +57,19 @@ class Library implements Comparable<Library> {
 
     public void Grade() {
         averageGrade = 0;
-        booksPerLibrary.forEach(book -> averageGrade += book.grade);
-        averageGrade /= booksPerLibrary.size();
-        this.grade = (booksPerLibrary.size() * 1.0 / booksPerDay) + (totalScore / signUpTime);
+        books.forEach(book -> averageGrade += book.grade);
+        averageGrade /= books.size();
+        double scaledTotalScore = (totalScore / Problem.maxTotalScore.totalScore) * 100;
+        double scaledSignUpTime = (signUpTime / Problem.maxSignUpTime.signUpTime) * 100;
+        double scaledBooksPerDay = (booksPerDay * 1.0 / Problem.maxBooksPerDay.booksPerDay) * 100;
+        double scaledNumberOfBooks = (numberOfBooks * 1.0 / Problem.maxNumOfBooks.numberOfBooks) * 100;
+        double scaledAverageScore = (averageScore / Problem.maxAverageScore.averageScore) * 100;
+        System.out.println(scaledTotalScore / scaledSignUpTime * 1.5 + " - "
+                + scaledBooksPerDay * Math.min(scaledNumberOfBooks * 1.0 / scaledBooksPerDay, Problem.daysForScanning) / 100
+                + " - " + scaledAverageScore * 0.01 * 0.2);
+        this.grade = (scaledTotalScore / scaledSignUpTime) * 1.5
+                + scaledBooksPerDay * Math.min(scaledNumberOfBooks * 1.0 / scaledBooksPerDay, Problem.daysForScanning) / 100
+                        + scaledAverageScore * 0.01 * 0.2;
     }
 
     @Override
@@ -102,7 +112,7 @@ class Solution {
 class Problem {
     int numOfBooks;
     int numOfLibraries;
-    int daysForScanning;
+    static int daysForScanning;
     String fileIn;
     List<Book> books = new ArrayList<>();
     List<Library> libraries = new ArrayList<>();
@@ -113,12 +123,18 @@ class Problem {
     List<Library> listLibraries = new ArrayList<>();
     List<List<Book>> listList = new ArrayList<>();
 
+    static Library maxTotalScore;
+    static Library maxNumOfBooks;
+    static Library maxBooksPerDay;
+    static Library maxSignUpTime;
+    static Library maxAverageScore;
+
     public Problem(String fileIn) throws FileNotFoundException {
         this.fileIn = fileIn;
         Scanner scanner = new Scanner(new File("src/Input/" + fileIn));
         numOfBooks = Integer.parseInt(scanner.next());
         numOfLibraries = Integer.parseInt(scanner.next());
-        daysForScanning = Integer.parseInt(scanner.next());
+        Problem.daysForScanning = Integer.parseInt(scanner.next());
         for (int i = 0; i < numOfBooks; i++) {
             books.add(new Book(i, Integer.parseInt(scanner.next())));
         }
@@ -135,14 +151,19 @@ class Problem {
             libraries.add(new Library(i, booksInLibrary, booksPerDay, signUpTime));
         }
 
+        maxTotalScore = libraries.stream().max(Comparator.comparing(library -> library.totalScore)).orElse(libraries.get(0));
+        maxNumOfBooks = libraries.stream().max(Comparator.comparing(library -> library.numberOfBooks)).orElse(libraries.get(0));
+        maxBooksPerDay = libraries.stream().max(Comparator.comparing(library -> library.booksPerDay)).orElse(libraries.get(0));
+        maxSignUpTime = libraries.stream().max(Comparator.comparing(library -> library.signUpTime)).orElse(libraries.get(0));
+        maxAverageScore = libraries.stream().max(Comparator.comparing(library -> library.averageScore)).orElse(libraries.get(0));
     }
 
     public void Solve() {
-        libraries.forEach(library -> library.booksPerLibrary.forEach(Book::Grade));
+        libraries.forEach(library -> library.books.forEach(Book::Grade));
         libraries.forEach(Library::Grade);
-
-        libraries.forEach(library -> library.booksPerLibrary.sort(Book::compareTo));
+        libraries.forEach(library -> library.books.sort(Book::compareTo));
         libraries.sort(Library::compareTo);
+
         int numberOfLibraries = 0;
         int daysPassed = 0;
         for (Library library : libraries) {
@@ -161,7 +182,7 @@ class Problem {
                     Math.min(library.numberOfBooks, (daysForScanning - library.startingDay) * library.booksPerDay);
 
             for (int j = 0; j < library.numberOfBooks; j++) {
-                Book book = library.booksPerLibrary.get(j);
+                Book book = library.books.get(j);
                 if (book.score >= library.averageScore && !booksScanned.contains(book) && availableBooks < realisticNumberOfBooks) {
                     booksScanned.add(book);
                     availableBooks++;
@@ -169,7 +190,7 @@ class Problem {
                 }
             }
             for (int j = 0; j < library.numberOfBooks; j++) {
-                Book book = library.booksPerLibrary.get(j);
+                Book book = library.books.get(j);
                 if (book.score < library.averageScore && !booksScanned.contains(book) && availableBooks < realisticNumberOfBooks) {
                     booksScanned.add(book);
                     availableBooks++;
